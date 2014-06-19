@@ -96,8 +96,8 @@ class Blob extends GitCakeAppModel {
 		preg_match_all('#\[submodule\s+[\"\'](?P<name>\S*)[\"\']\]\s+path\s=\s(?P<path>\S+)\s+url\s=\s(?P<remote>\S+)#', $resp['content'], $matches);
 
 		foreach ($matches['name'] as $i => $name) {
-			preg_match('#(?P<protocol>(git|https?)://|git@)(?P<url>\S+)#', $matches['remote'][$i], $remote);
-			if ($remote['protocol'] == 'git@') {
+			preg_match('#(?P<protocol>(git|https?)://|(?P<username>\S+)@)(?P<url>\S+)#', $matches['remote'][$i], $remote);
+			if (isset($remote['username'])) {
 				$remote['url'] = str_replace(':', '/', $remote['url']);
 			}
 
