@@ -137,7 +137,7 @@ class SourceGit extends SourceControl {
 	public function calculateBranches($branches = array()) {
 		$cleanedBranches = array();
 		foreach ($branches as $branch) {
-			if (preg_match('/^(\*\s+)?(?P<name>.+)/', $branch, $matches)) {
+			if (preg_match('/^\*?\s*(?P<name>.+)/', $branch, $matches)) {
 				$cleanedBranches[] = $matches['name'];
 			}
 		}
