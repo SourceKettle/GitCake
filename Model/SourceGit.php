@@ -297,8 +297,6 @@ class SourceGit extends SourceControl {
  * @return void
  */
 	public function getPathDetails($branch, $path) {
-		$branch = escapeshellarg($branch);
-		$path = escapeshellarg($path);
 
 		// Check the last character isnt a / otherwise git will return the contents of the folder
 		if ($path != '' && $path[strlen($path)-1] == '/') {
@@ -313,6 +311,9 @@ class SourceGit extends SourceControl {
 				'permissions' => '0'
 			);
 		}
+
+		$branch = escapeshellarg($branch);
+		$path = escapeshellarg($path);
 
 		if (!preg_match('/^(?P<permissions>[0-9]+) (?P<type>[a-z]+) (?P<hash>[0-9a-zA-Z]+)\s(?P<name>.+)/', $this->exec("ls-tree -z $branch -- $path"), $details)) {
 			return null;
