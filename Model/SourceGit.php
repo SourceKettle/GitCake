@@ -153,13 +153,18 @@ class SourceGit extends SourceControl {
  * @param mixed $base (default: null) the path to use
  * @param mixed $mode (default: null) the permissions mode to set on the repository (supports chmod-style arguments e.g. g+rwX, 0750)
  * @param bool $shared (default: false) the 'shared' option as per git init - (false|true|umask|group|all|world|everybody|0xxx)
+ * @param string $cloneFrom (default: null) optional repository to clone from instead of creating a new one
  * @return void
  */
-	public static function create($base = null, $mode = null, $shared = false) {
+	public static function create($base = null, $mode = null, $shared = false, $cloneFrom = null) {
 		if ($base == null) return null;
 
 		if(!preg_match('/^([0-9]+)|([ugoa]+[+-=][rwxX]+)$/', $mode)){
-			$mode = null;
+			throw new Exception("Invalid mode '$mode' when creating git repo");
+		}
+
+		if ($cloneFrom != null && !is_dir($cloneFrom)) {
+			throw new Exception("Attempted to clone from nonexistent repo '$cloneFrom'");
 		}
 
 		if (!file_exists($base)) {
@@ -167,10 +172,10 @@ class SourceGit extends SourceControl {
 		}
 
 		// Note that $shared is sanitised within the Git class
-		Git::create($base, null, true, $shared);
+		Git::create($base, $cloneFrom, true, $shared);
 
 		// Ensure the permissions are set correctly, e.g. so the git group can have write access.
-		// No recursive chmod() in PHP.	 Ahead fudge factor 3.
+		// No recursive chmod() in PHP, and Cake doesn't support +X.	 Ahead fudge factor 3.
 		// TODO could be replaced with a lot of extra code to recurse down
 		// the directory tree, if there's a reason to (safe mode?)
 		if($mode != null){
