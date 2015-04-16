@@ -23,6 +23,7 @@ class SourceSubversion extends SourceControl {
 	public $repo = null;
 	public $type = RepoTypes::SVN;
 	private $branches = array();
+	private $tags = array();
 
 /**
  * exec function.
@@ -124,6 +125,10 @@ class SourceSubversion extends SourceControl {
  */
 	public function getBranches() {
 		return $this->branches;
+	}
+
+	public function getTags() {
+		return $this->tags;
 	}
 
 /**

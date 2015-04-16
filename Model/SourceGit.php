@@ -32,12 +32,11 @@ class SourceGit extends SourceControl {
  * @param string $hash
  * @return boolean true if passes
  */
-	public static function ensureValidHash($hash) {
-		if (strlen($hash) < 1) {
-			throw new Exception("The provided hash ($hash) is not valid. Reason: Hash is zero length");
-		}
-		if (!preg_match('/^[A-Za-z0-9]+$/', $hash)) {
-			throw new Exception("The provided hash ($hash) is not valid. Reason: Hash is not alphanumeric");
+	public function ensureValidRef($ref) {
+		try{
+			$this->exec("check-ref-format --branch ".escapeshellarg($ref));
+		} catch (Exception $e) {
+			throw new Exception("Invalid ref format: '$ref'");
 		}
 		return true;
 	}
@@ -193,7 +192,7 @@ class SourceGit extends SourceControl {
  * @return void
  */
 	public function exists($hash = null) {
-		SourceGit::ensureValidHash($hash);
+		$this->ensureValidRef($hash);
 		return $this->exec("rev-parse $hash");
 	}
 
@@ -207,6 +206,10 @@ class SourceGit extends SourceControl {
 		return $this->branches;
 	}
 
+	public function getTags() {
+		return $this->tags;
+	}
+
 /**
  * getCommitMetadata function.
  *
@@ -215,8 +218,9 @@ class SourceGit extends SourceControl {
  * @param mixed $metadata
  * @return void
  */
+
 	public function getCommitMetadata($hash, $metadata) {
-		SourceGit::ensureValidHash($hash);
+		$this->ensureValidRef($hash);
 
 		if (!is_array($metadata)) {
 			$metadata = array($metadata);
@@ -254,11 +258,11 @@ class SourceGit extends SourceControl {
  * @return void
  */
 	public function getChangedFiles($hash, $parent) {
-		SourceGit::ensureValidHash($hash);
+		$this->ensureValidRef($hash);
 		if ($parent == null || $parent == '') {
 			$parent = '--root';
 		} else {
-			SourceGit::ensureValidHash($parent);
+			$this->ensureValidRef($parent);
 		}
 
 		$changes = $this->exec("diff-tree --name-only -r $parent $hash");
@@ -277,12 +281,12 @@ class SourceGit extends SourceControl {
  * @return void
  */
 	public function getDiff($hash, $parent, $file = '') {
-		SourceGit::ensureValidHash($hash);
+		$this->ensureValidRef($hash);
 		$file = escapeshellarg($file);
 		if ($parent == null || $parent == '') {
 			$parent = '--root';
 		} else {
-			SourceGit::ensureValidHash($parent);
+			$this->ensureValidRef($parent);
 		}
 
 		if ($file != '') {
@@ -352,6 +356,7 @@ class SourceGit extends SourceControl {
 		$this->repo = Git::open($location);
 
 		$this->branches = $this->calculateBranches(explode("\n", $this->exec('branch')));
+		$this->tags= $this->calculateBranches(explode("\n", $this->exec('tag -l')));
 
 		return $this->repo;
 	}
@@ -383,7 +388,7 @@ class SourceGit extends SourceControl {
  * @return void
  */
 	public function show($hash) {
-		SourceGit::ensureValidHash($hash);
+		$this->ensureValidRef($hash);
 		return $this->exec("show $hash");
 	}
 

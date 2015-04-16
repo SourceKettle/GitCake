@@ -100,6 +100,10 @@ class GitCakeAppModel extends AppModel {
 		return $this->engine->getBranches();
 	}
 
+	public function getTags() {
+		return $this->engine->getTags();
+	}
+
 /**
  * getType function.
  *

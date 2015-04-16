@@ -20,6 +20,7 @@ abstract class SourceControl {
 
 	abstract public function exists($hash);
 	abstract public function getBranches();
+	abstract public function getTags();
 	abstract public function getCommitMetadata($hash, $metadata);
 	abstract public function getChangedFiles($hash, $parent);
 	abstract public function getDiff($hash, $parent, $file);
