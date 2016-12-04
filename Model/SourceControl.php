@@ -16,7 +16,7 @@
  */
 
 abstract class SourceControl {
-	abstract public static function create($base, $mode, $shared);
+	public static function create($base = null, $mode = null, $shared = false, $cloneFrom = null) { }
 
 	abstract public function exists($hash);
 	abstract public function getBranches();

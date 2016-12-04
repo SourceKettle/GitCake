@@ -37,7 +37,8 @@ class Commit extends GitCakeAppModel {
 	public function diff($hash, $parent, $file = '') {
 		$output = $this->engine->getDiff($hash, $parent, $file);
 
-		$output = Diff::parse($output);
+		$diff = new Diff();
+		$output = $diff->parse($output);
 
 		foreach ($output as $fileName => $array) {
 			$output[$fileName]['less'] = 0;
